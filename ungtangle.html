@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Untangle</title>
+   <link rel="stylesheet" type="text/css" href="untangle.css">
+
+</head>
+
+<body onload="init()">
+
+  <h2>Title</h2>
+
+  <div id="container">
+    <div id="control">
+      <button onclick="drawNode()">Node</button>
+      <p></p>
+      <button onclick="drawLine()">Edge</button>
+      <p></p>
+      <button onclick="connectNodes()">Connect</button>
+    </div>
+    <div id="canvas">
+      <canvas id="untangle" width="500" height="500" style="border:1px solid #d3d3d3;">
+        Your browser does not support the HTML5 canvas tag.
+      </canvas>
+    </div>
+    <div id="info">
+      Nodes:
+      <div id="nodes">
+
+      </div>
+      Edges:
+      <div id="edges">
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="untangle.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+h2 {
+  color: blue;
+  /*font-size: 10px;*/
+}
+
+#container {
+  display: block;
+  margin-right: 20px;
+}
+
+#control {
+  float: left;
+  margin-right: 20px;
+  width: 12%;
+}
+
+#canvas {
+  position: relative;
+  float: left;
+}
+
+#untangle {
+  width: 733,
+  height: 500,
+  border: 1px solid #d3d3d3
+}
+
+#info {
+  width: 28%;
+  float: right;
+  height: 500px;
+  overflow-y: scroll;
+}
+
+#nodes {
+  overflow-y: scroll;
+}
+
+#edges {
+  overflow-y: scroll;
+}
