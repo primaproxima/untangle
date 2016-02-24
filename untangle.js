@@ -66,7 +66,10 @@ var unclicked = function(event) {
 var update = function(ctx, x, y) {
   ctx.clearRect(0,0,500,500);
   ctx.save();
+
   // draw old shapes
+  drawEdges(ctx);
+  
   for(var i = 0; i < state.nodes.length; i++) {
     if(i === state.currentNode) {
       continue;
@@ -81,8 +84,6 @@ var update = function(ctx, x, y) {
   drawNode(x, y, oldNode[0].color, state.currentNode);
   //state.currentNode = state.nodes.length-1;
   //console.log('> redrawing', state.nodes.length, state.currentNode);
-
-  drawEdges(ctx);
 
   ctx.restore();
 };
