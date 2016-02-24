@@ -54,7 +54,7 @@ var moving = function(event) {
   var x = event.pageX - container.offsetLeft;
   var y = event.pageY - container.offsetTop;
 
-  update2(getContext(), x,y);
+  update(getContext(), x,y);
 };
 
 var unclicked = function(event) {
@@ -64,10 +64,6 @@ var unclicked = function(event) {
 };
 
 var update = function(ctx, x, y) {
-  //console.log('> before redrawing', state.nodes.length, state.currentNode);
-  /*var p = document.getElementById("update");
-  p.innerHTML = 'x : ' + x + ', y : ' + y;
-/**/
   ctx.clearRect(0,0,500,500);
   ctx.save();
   // draw old shapes
@@ -110,10 +106,10 @@ var update2 = function(ctx, x, y) {
 var drawNode = function (x, y, color) {
     //color = "#00AAD2";
     if(x === undefined) {
-      x = Math.random() * 500;
+      x = Math.floor(Math.random() * 500);
     }
     if(y === undefined) {
-      y = Math.random() * 500;
+      y = Math.floor(Math.random() * 500);
     }
     if(color === undefined) {
       color = '#'+Math.floor(Math.random()*16777215).toString(16);
@@ -184,16 +180,15 @@ var drawLine = function(x1, y1, x2, y2, color) {
     var p = document.createElement('p');
     p.innerHTML = line.x1 + ', ' + line.y1 + ', ' + line.x2 + ', ' + line.y2;
     info.appendChild(p);
-  }
+  }/**/
 };
 
 var line = function(ctx, x1, y1, x2, y2, color) {
   //ctx.fillStyle = color;
-  ctx.beginPath();
+  //ctx.beginPath();
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
-  ctx.stroke();
-  ctx.closePath();
+  //ctx.closePath();
 };
 
 var Line = function(x1, y1, x2, y2, color) {
@@ -205,12 +200,10 @@ var Line = function(x1, y1, x2, y2, color) {
 };
 
 var check = function(clickedX, clickedY) {
-  //console.log('> checking', clickedX, clickedY);
   for (var i = 0; i < state.nodes.length; i++) {
     if (clickedX < state.nodes[i].right && clickedX > state.nodes[i].left
       && clickedY > state.nodes[i].top && clickedY < state.nodes[i].bottom) {
       state.currentNode = i;
-      //console.log('> check', i);
       return true;
     }
   }
@@ -229,5 +222,6 @@ var connectNodes = function(ctx) {
       drawLine(node1.x, node1.y, node2.x, node2.y);
     }
   }
+  ctx.stroke();
   ctx.closePath();
 };
