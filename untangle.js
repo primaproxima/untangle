@@ -1,14 +1,15 @@
 var state = {
   canvas: null,
   clicked : false,
-  initialized : false,
-  nodes : [],
-  edges : [],
-  currentNode : -1
+  initialized: false,
+  nodes: [],
+  edges: [],
+  currentNode: -1,
+  R: 8,
+  color: "#00AAD2"
 };
 
 function init() {
-  console.log('initializing canvas');
   if(this.state.initialized) return;
 
   var canvas = document.getElementById("untangle");
@@ -18,8 +19,16 @@ function init() {
 
   this.state.canvas = canvas;
   this.state.initialized = true;
-  console.log('canvas initializeds');
-}
+
+  for(var i=0; i<20; i++) {
+    var x,y,color,position;
+    var node = createNode(x, y, state.R, color, position);
+  }
+  connectNodes();
+  for(var i=0; i<20; i++) {
+    drawNode(getContext(), state.nodes[i]);
+  }
+};
 
 var getContext = function() {
 
@@ -32,9 +41,6 @@ var getContext = function() {
 };
 
 var clicked = function(event) {
-  //console.log('> onmousedown');
-  //state.clicked = true;
-
   var container = document.getElementById('canvas');
 
   var x = event.pageX - container.offsetLeft;
@@ -48,17 +54,15 @@ var clicked = function(event) {
 var moving = function(event) {
   if(!state.clicked) return;
 
-  //console.log('> onmouseover');
   var container = document.getElementById('canvas');
 
   var x = event.pageX - container.offsetLeft;
   var y = event.pageY - container.offsetTop;
 
-  update(getContext(), x,y);
+  update(getContext(), x, y);
 };
 
 var unclicked = function(event) {
-  console.log('> onmouseup');
   state.clicked = false;
   state.currentNode = -1;
 };
@@ -69,93 +73,63 @@ var update = function(ctx, x, y) {
 
   // draw old shapes
   drawEdges(ctx);
-  
+
   for(var i = 0; i < state.nodes.length; i++) {
     if(i === state.currentNode) {
-      continue;
+      state.nodes[i].x = x;
+      state.nodes[i].y = y;
     }
     var node = state.nodes[i];
-    this.node(getContext(), node.x, node.y, 8, node.color);
+    drawNode(ctx, node);
   }
 
-  // add new node
-  var oldNode = state.nodes.splice(state.currentNode, 1);
-  //console.log(oldNode);
-  drawNode(x, y, oldNode[0].color, state.currentNode);
-  //state.currentNode = state.nodes.length-1;
-  //console.log('> redrawing', state.nodes.length, state.currentNode);
-
   ctx.restore();
 };
 
-var update2 = function(ctx, x, y) {
-  var node = state.nodes.splice(state.currentNode, 1)[0];
-  console.log('> clear', node, node.left, node.top, 16, 16);
-  ctx.clearRect(node.left, node.top, 16, 16);
-  //ctx.clearRect(0,0,500,500);
-  ctx.save();
+var createNode = function(x, y, r, color, position) {
+  if(x === undefined) {
+    x = Math.floor(Math.random() * 500);
+  }
+  if(y === undefined) {
+    y = Math.floor(Math.random() * 500);
+  }
+  if(r === undefined) {
+    r = state.R;
+  }
+  if(color === undefined) {
+    color = '#'+Math.floor(Math.random()*16777215).toString(16);
+  }
 
-  // add new node
-  drawNode(x, y, node.color);
-  state.currentNode = state.nodes.length-1;
+  var node = new Node(x, y, r, color);
+  if(position === undefined) {
+    this.state.nodes.push(node);
+  } else {
+    this.state.nodes.splice(this.state.currentNode, 0, node);
+  }
 
-  connectNodes(ctx);
-
-  ctx.restore();
+  return node;
 };
 
-var drawNode = function (x, y, color, position) {
-    //color = "#00AAD2";
-    if(x === undefined) {
-      x = Math.floor(Math.random() * 500);
-    }
-    if(y === undefined) {
-      y = Math.floor(Math.random() * 500);
-    }
-    if(color === undefined) {
-      color = '#'+Math.floor(Math.random()*16777215).toString(16);
-    }
-
-    this.node(getContext(), x, y, 8, color);
-    var node = new Node(x, y, 8, color);
-    if(position === undefined) {
-      this.state.nodes.push(node);
-    } else {
-      this.state.nodes.splice(this.state.currentNode, 0, node);
-    }
-/*
-    var info = document.getElementById('nodes');
-    while (info.hasChildNodes()) {
-      info.removeChild(info.firstChild);
-    }
-    for(var i=0; i<state.nodes.length; i++) {
-      var node = state.nodes[i];
-      var p = document.createElement('p');
-      p.innerHTML = node.x + ', ' + node.y;
-      info.appendChild(p);
-    }/**/
+var drawNode = function (ctx, node) {
+    ctx.fillStyle = node.color;
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, node.r, 0, Math.PI*2, true);
+    ctx.closePath();
+    ctx.fill();
 };
 
-var node = function(ctx, x, y, r, color) {
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI*2, true);
-  ctx.closePath();
-  ctx.fill();
-};
-
-var Node = function(x, y, radius, color) {
+var Node = function(x, y, r, color) {
   this.x = x;
   this.y = y;
+  this.r = r;
   this.color = color;
-  this.left = x - radius;
-  this.top = y - radius;
-  this.right = x + radius;
-  this.bottom = y + radius;
+  this.left = function() { return this.x - this.r; }
+  this.top = function() { return this.y - this.r; }
+  this.right = function() { return this.x + this.r; }
+  this.bottom = function() { return this.y + this.r; }
 };
 
 var drawLine = function(x1, y1, x2, y2, color) {
-  //console.log('> drawLine', x1, y1, x2, y2);
   if(x1 === undefined) {
     x1 = Math.random() * 500;
   }
@@ -172,28 +146,10 @@ var drawLine = function(x1, y1, x2, y2, color) {
     color = '#'+Math.floor(Math.random()*16777215).toString(16);
   }
 
-  this.line(getContext(), x1, y1, x2, y2, color);
-  var line = new Line(x1, y1, x2, y2, color);
-  this.state.edges.push(line);
-/*
-  var info = document.getElementById('edges');
-  while (info.hasChildNodes()) {
-    info.removeChild(info.firstChild);
-  }
-  for(var i=0; i<state.edges.length; i++) {
-    var line = state.edges[i];
-    var p = document.createElement('p');
-    p.innerHTML = line.x1 + ', ' + line.y1 + ', ' + line.x2 + ', ' + line.y2;
-    info.appendChild(p);
-  }/**/
-};
-
-var line = function(ctx, x1, y1, x2, y2, color) {
-  //ctx.fillStyle = color;
-  //ctx.beginPath();
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
-  //ctx.closePath();
+  //var line = new Line(x1, y1, x2, y2, color);
+  //this.state.edges.push(line);
 };
 
 var Line = function(x1, y1, x2, y2, color) {
@@ -206,8 +162,8 @@ var Line = function(x1, y1, x2, y2, color) {
 
 var check = function(clickedX, clickedY) {
   for (var i = 0; i < state.nodes.length; i++) {
-    if (clickedX < state.nodes[i].right && clickedX > state.nodes[i].left
-      && clickedY > state.nodes[i].top && clickedY < state.nodes[i].bottom) {
+    if (clickedX < state.nodes[i].right() && clickedX > state.nodes[i].left()
+      && clickedY > state.nodes[i].top() && clickedY < state.nodes[i].bottom()) {
       state.currentNode = i;
       return true;
     }
@@ -223,8 +179,6 @@ var connectNodes = function() {
     this.state.edges.push(edge);
   }
 
-  //console.log(this.state.edges);
-
   drawEdges();
 };
 
@@ -238,7 +192,6 @@ var drawEdges = function(ctx) {
     var node1 = this.state.nodes[nodes[0]];
     var node2 = this.state.nodes[nodes[1]];
     if(node1 !== undefined && node2 !== undefined) {
-      //console.log('> connectNodes', node1.x, node1.y, node2.x, node2.y);
       drawLine(node1.x, node1.y, node2.x, node2.y);
     }
   }
