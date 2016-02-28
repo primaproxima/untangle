@@ -25,6 +25,7 @@ function init() {
     var node = createNode(x, y, state.R, color, position);
   }
   connectNodes();
+  //connectNodes();
   for(var i=0; i<20; i++) {
     drawNode(getContext(), state.nodes[i]);
   }
@@ -65,6 +66,8 @@ var moving = function(event) {
 var unclicked = function(event) {
   state.clicked = false;
   state.currentNode = -1;
+
+  checkUntangled();
 };
 
 var update = function(ctx, x, y) {
@@ -129,7 +132,7 @@ var Node = function(x, y, r, color) {
   this.bottom = function() { return this.y + this.r; }
 };
 
-var drawLine = function(x1, y1, x2, y2, color) {
+var drawLine = function(ctx, x1, y1, x2, y2, color) {
   if(x1 === undefined) {
     x1 = Math.random() * 500;
   }
@@ -148,8 +151,6 @@ var drawLine = function(x1, y1, x2, y2, color) {
 
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
-  //var line = new Line(x1, y1, x2, y2, color);
-  //this.state.edges.push(line);
 };
 
 var Line = function(x1, y1, x2, y2, color) {
@@ -179,20 +180,17 @@ var connectNodes = function() {
     this.state.edges.push(edge);
   }
 
-  drawEdges();
+  drawEdges(getContext());
 };
 
 var drawEdges = function(ctx) {
-  if(ctx === undefined) {
-    ctx = getContext();
-  }
   ctx.beginPath();
   for(var i=0; i<this.state.edges.length; i++) {
     var nodes = this.state.edges[i];
     var node1 = this.state.nodes[nodes[0]];
     var node2 = this.state.nodes[nodes[1]];
     if(node1 !== undefined && node2 !== undefined) {
-      drawLine(node1.x, node1.y, node2.x, node2.y);
+      drawLine(ctx, node1.x, node1.y, node2.x, node2.y);
     }
   }
   ctx.stroke();
