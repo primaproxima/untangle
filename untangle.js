@@ -1,4 +1,4 @@
-var state = {
+const state = {
   canvas: null,
   clicked : false,
   initialized: false,
@@ -12,7 +12,7 @@ var state = {
 function init() {
   if(this.state.initialized) return;
 
-  var canvas = document.getElementById("untangle");
+  const canvas = document.getElementById("untangle");
   canvas.addEventListener("mousedown", clicked, false);
   canvas.addEventListener("mousemove", moving, false);
   canvas.addEventListener("mouseup", unclicked, false);
@@ -20,20 +20,19 @@ function init() {
   this.state.canvas = canvas;
   this.state.initialized = true;
 
-  for(var i=0; i<20; i++) {
-    var x,y,color,position;
-    var node = createNode(x, y, state.R, color, position);
+  for(let i=0; i<20; i++) {
+    let x,y,color,position;
+    const node = createNode(x, y, state.R, color, position);
   }
   connectNodes();
-  //connectNodes();
-  for(var i=0; i<20; i++) {
+  for(let i=0; i<20; i++) {
     drawNode(getContext(), state.nodes[i]);
   }
-};
+}
 
-var getContext = function() {
+const getContext = function() {
 
-  var ctx = null;
+  let ctx = null;
   if(this.state.canvas.getContext) {
     ctx = this.state.canvas.getContext("2d");
   }
@@ -41,55 +40,55 @@ var getContext = function() {
   return ctx;
 };
 
-var clicked = function(event) {
-  var container = document.getElementById('canvas');
+const clicked = function(event) {
+  const container = document.getElementById('canvas');
 
-  var x = event.pageX - container.offsetLeft;
-  var y = event.pageY - container.offsetTop;
+  const x = event.pageX - container.offsetLeft;
+  const y = event.pageY - container.offsetTop;
 
   if(check(x, y)) {
     state.clicked = true;
   }
 };
 
-var moving = function(event) {
+const moving = function(event) {
   if(!state.clicked) return;
 
-  var container = document.getElementById('canvas');
+  const container = document.getElementById('canvas');
 
-  var x = event.pageX - container.offsetLeft;
-  var y = event.pageY - container.offsetTop;
+  const x = event.pageX - container.offsetLeft;
+  const y = event.pageY - container.offsetTop;
 
   update(getContext(), x, y);
 };
 
-var unclicked = function(event) {
+const unclicked = function(event) {
   state.clicked = false;
   state.currentNode = -1;
 
   checkUntangled();
 };
 
-var update = function(ctx, x, y) {
+const update = function(ctx, x, y) {
   ctx.clearRect(0,0,500,500);
   ctx.save();
 
   // draw old shapes
   drawEdges(ctx);
 
-  for(var i = 0; i < state.nodes.length; i++) {
+  for(let i = 0; i < state.nodes.length; i++) {
     if(i === state.currentNode) {
       state.nodes[i].x = x;
       state.nodes[i].y = y;
     }
-    var node = state.nodes[i];
+    const node = state.nodes[i];
     drawNode(ctx, node);
   }
 
   ctx.restore();
 };
 
-var createNode = function(x, y, r, color, position) {
+const createNode = function(x, y, r, color, position) {
   if(x === undefined) {
     x = Math.floor(Math.random() * 500);
   }
@@ -103,7 +102,7 @@ var createNode = function(x, y, r, color, position) {
     color = '#'+Math.floor(Math.random()*16777215).toString(16);
   }
 
-  var node = new Node(x, y, r, color);
+  const node = new Node(x, y, r, color);
   if(position === undefined) {
     this.state.nodes.push(node);
   } else {
@@ -113,7 +112,7 @@ var createNode = function(x, y, r, color, position) {
   return node;
 };
 
-var drawNode = function (ctx, node) {
+const drawNode = function (ctx, node) {
     ctx.fillStyle = node.color;
     ctx.beginPath();
     ctx.arc(node.x, node.y, node.r, 0, Math.PI*2, true);
@@ -121,7 +120,7 @@ var drawNode = function (ctx, node) {
     ctx.fill();
 };
 
-var Node = function(x, y, r, color) {
+const Node = function(x, y, r, color) {
   this.x = x;
   this.y = y;
   this.r = r;
@@ -132,7 +131,7 @@ var Node = function(x, y, r, color) {
   this.bottom = function() { return this.y + this.r; }
 };
 
-var drawLine = function(ctx, x1, y1, x2, y2, color) {
+const drawLine = function(ctx, x1, y1, x2, y2, color) {
   if(x1 === undefined) {
     x1 = Math.random() * 500;
   }
@@ -153,7 +152,7 @@ var drawLine = function(ctx, x1, y1, x2, y2, color) {
   ctx.lineTo(x2, y2);
 };
 
-var Line = function(x1, y1, x2, y2, color) {
+const Line = function(x1, y1, x2, y2, color) {
   this.x1 = x1;
   this.y1 = y1;
   this.x2 = x2;
@@ -161,8 +160,8 @@ var Line = function(x1, y1, x2, y2, color) {
   this.color = color;
 };
 
-var check = function(clickedX, clickedY) {
-  for (var i = 0; i < state.nodes.length; i++) {
+const check = function(clickedX, clickedY) {
+  for (let i = 0; i < state.nodes.length; i++) {
     if (clickedX < state.nodes[i].right() && clickedX > state.nodes[i].left()
       && clickedY > state.nodes[i].top() && clickedY < state.nodes[i].bottom()) {
       state.currentNode = i;
@@ -171,9 +170,9 @@ var check = function(clickedX, clickedY) {
   }
 };
 
-var connectNodes = function() {
-  for(var i=0; i<this.state.nodes.length; i++) {
-    var edge = [i, Math.floor(Math.random()*this.state.nodes.length)];
+const connectNodes = function() {
+  for(let i=0; i<this.state.nodes.length; i++) {
+    const edge = [i, Math.floor(Math.random()*this.state.nodes.length)];
     if(edge[0] === edge[1]) {
       continue;
     }
@@ -183,12 +182,12 @@ var connectNodes = function() {
   drawEdges(getContext());
 };
 
-var drawEdges = function(ctx) {
+const drawEdges = function(ctx) {
   ctx.beginPath();
-  for(var i=0; i<this.state.edges.length; i++) {
-    var nodes = this.state.edges[i];
-    var node1 = this.state.nodes[nodes[0]];
-    var node2 = this.state.nodes[nodes[1]];
+  for(let i=0; i<this.state.edges.length; i++) {
+    const nodes = this.state.edges[i];
+    const node1 = this.state.nodes[nodes[0]];
+    const node2 = this.state.nodes[nodes[1]];
     if(node1 !== undefined && node2 !== undefined) {
       drawLine(ctx, node1.x, node1.y, node2.x, node2.y);
     }
